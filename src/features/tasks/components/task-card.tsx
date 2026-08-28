@@ -1,3 +1,5 @@
+"use client";
+
 import { CalendarDays, MoreVertical, Pencil, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -17,14 +19,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { PRIORITY_META } from "../config";
-import { formatDueDate } from "../format";
+import { formatDueDate } from "../utils/format";
 import type { Task } from "../types";
 
 interface TaskCardProps {
   task: Task;
+  onEditTask: (task: Task) => void;
+  onDeleteTask: (task: Task) => void;
 }
 
-export function TaskCard({ task }: TaskCardProps) {
+const TaskCard = ({ task, onEditTask, onDeleteTask }: TaskCardProps) => {
   const priority = PRIORITY_META[task.priority];
 
   return (
@@ -46,11 +50,14 @@ export function TaskCard({ task }: TaskCardProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => onEditTask(task)}>
                 <Pencil />
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem variant="destructive">
+              <DropdownMenuItem
+                variant="destructive"
+                onSelect={() => onDeleteTask(task)}
+              >
                 <Trash2 />
                 Delete
               </DropdownMenuItem>
@@ -67,4 +74,6 @@ export function TaskCard({ task }: TaskCardProps) {
       </CardContent>
     </Card>
   );
-}
+};
+
+export default TaskCard;

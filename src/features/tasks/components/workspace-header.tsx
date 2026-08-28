@@ -2,7 +2,11 @@ import { ListTodo, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
-export function WorkspaceHeader() {
+interface WorkspaceHeaderProps {
+  onAddTask: () => void;
+}
+
+const WorkspaceHeader = ({ onAddTask }: WorkspaceHeaderProps) => {
   return (
     <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
       <div className="flex items-start gap-3">
@@ -22,10 +26,12 @@ export function WorkspaceHeader() {
         </div>
       </div>
 
-      <Button size="lg" className="w-full sm:w-auto">
+      <Button size="lg" className="w-full sm:w-auto" onClick={onAddTask}>
         <Plus />
         Add task
       </Button>
     </header>
   );
-}
+};
+
+export default WorkspaceHeader;

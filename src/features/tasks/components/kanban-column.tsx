@@ -1,14 +1,21 @@
 import { Badge } from "@/components/ui/badge";
 import { STATUS_META } from "../config";
 import type { Task, TaskStatus } from "../types";
-import { TaskCard } from "./task-card";
+import TaskCard from "./task-card";
 
 interface KanbanColumnProps {
   status: TaskStatus;
   tasks: readonly Task[];
+  onEditTask: (task: Task) => void;
+  onDeleteTask: (task: Task) => void;
 }
 
-export function KanbanColumn({ status, tasks }: KanbanColumnProps) {
+const KanbanColumn = ({
+  status,
+  tasks,
+  onEditTask,
+  onDeleteTask,
+}: KanbanColumnProps) => {
   const { label, indicatorClassName } = STATUS_META[status];
   const headingId = `column-${status}`;
 
@@ -33,10 +40,16 @@ export function KanbanColumn({ status, tasks }: KanbanColumnProps) {
       <ul className="flex flex-col gap-3">
         {tasks.map((task) => (
           <li key={task.id}>
-            <TaskCard task={task} />
+            <TaskCard
+              task={task}
+              onEditTask={onEditTask}
+              onDeleteTask={onDeleteTask}
+            />
           </li>
         ))}
       </ul>
     </section>
   );
-}
+};
+
+export default KanbanColumn;
