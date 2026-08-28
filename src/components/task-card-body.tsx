@@ -25,9 +25,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { PRIORITY_META } from "../config";
-import { formatDueDate } from "../utils/format";
-import type { Task } from "../types";
+import { PRIORITY_META } from "@/config";
+import { formatDueDate } from "@/utils/format";
+import type { Task } from "@/types";
 
 interface TaskCardBodyProps {
   task: Task;

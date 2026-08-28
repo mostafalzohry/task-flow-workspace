@@ -2,10 +2,10 @@
 
 import { useMemo, useState } from "react";
 
-import { filterTasks } from "../utils/task-filters";
-import { useTaskFilters } from "../hooks/use-task-filters";
-import { useTasksQuery } from "../queries/use-tasks";
-import type { Task } from "../types";
+import { filterTasks } from "@/utils/task-filters";
+import { useTaskFilters } from "@/hooks/use-task-filters";
+import { useTasksQuery } from "@/queries/use-tasks";
+import type { Task, TaskStatus } from "@/types";
 import DeleteTaskDialog from "./delete-task-dialog";
 import KanbanBoard from "./kanban-board";
 import KanbanBoardEmpty from "./kanban-board-empty";
@@ -24,6 +24,7 @@ const TaskWorkspace = () => {
 
   const [taskDialogTask, setTaskDialogTask] = useState<Task | null>(null);
   const [taskDialogOpen, setTaskDialogOpen] = useState(false);
+  const [createStatus, setCreateStatus] = useState<TaskStatus>("todo");
   const [deleteTarget, setDeleteTarget] = useState<Task | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
@@ -33,10 +34,13 @@ const TaskWorkspace = () => {
     [tasks, filters.appliedFilters],
   );
 
-  const openCreate = () => {
+  const openCreateInStatus = (status: TaskStatus) => {
     setTaskDialogTask(null);
+    setCreateStatus(status);
     setTaskDialogOpen(true);
   };
+
+  const openCreate = () => openCreateInStatus("todo");
 
   const openEdit = (task: Task) => {
     setTaskDialogTask(task);
@@ -110,6 +114,7 @@ const TaskWorkspace = () => {
                 tasks={visibleTasks}
                 onEditTask={openEdit}
                 onDeleteTask={openDelete}
+                onCreateTask={openCreateInStatus}
               />
             </div>
           )}
@@ -119,6 +124,7 @@ const TaskWorkspace = () => {
       <TaskDialog
         open={taskDialogOpen}
         task={taskDialogTask}
+        createStatus={createStatus}
         onOpenChange={setTaskDialogOpen}
       />
       <DeleteTaskDialog

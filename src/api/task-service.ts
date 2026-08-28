@@ -6,7 +6,7 @@ import type {
   Task,
   TaskListQuery,
   UpdateTaskInput,
-} from "../types";
+} from "@/types";
 import { normalizeTask, normalizeTasks } from "./task-normalize";
 
 const TASKS_PATH = "/tasks";

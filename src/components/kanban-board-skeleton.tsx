@@ -1,5 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { STATUS_ORDER } from "../config";
+import { STATUS_ORDER } from "@/config";
 
 const TaskCardSkeleton = () => {
   return (

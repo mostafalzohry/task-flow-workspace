@@ -1,8 +1,9 @@
 "use client";
 
 import { useId } from "react";
-import { FilterX, LoaderCircle, Search } from "lucide-react";
+import { FilterX, LoaderCircle, Search, X } from "lucide-react";
 
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,9 +14,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PRIORITY_META, PRIORITY_ORDER, STATUS_META, STATUS_ORDER } from "../config";
-import type { PriorityFilter, StatusFilter } from "../types";
-import { asPriorityFilter, asStatusFilter } from "../utils/task-filters";
+import { PRIORITY_META, PRIORITY_ORDER, STATUS_META, STATUS_ORDER } from "@/config";
+import type { PriorityFilter, StatusFilter } from "@/types";
+import { asPriorityFilter, asStatusFilter } from "@/utils/task-filters";
 
 interface TaskToolbarProps {
   searchInput: string;
@@ -70,7 +71,7 @@ const TaskToolbar = ({
             id={searchId}
             type="search"
             placeholder="Search tasks..."
-            className="pl-8"
+            className="pl-8 [&::-webkit-search-cancel-button]:cursor-pointer"
             value={searchInput}
             onChange={(event) => onSearchChange(event.target.value)}
           />
@@ -78,45 +79,78 @@ const TaskToolbar = ({
 
         <div className="grid gap-1.5">
           <Label className="text-xs text-muted-foreground">Status</Label>
-          <Select
-            value={status}
-            onValueChange={(value) => onStatusChange(asStatusFilter(value))}
-          >
-            <SelectTrigger aria-label="Filter by status" className="w-full sm:w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All statuses</SelectItem>
-              {STATUS_ORDER.map((option) => (
-                <SelectItem key={option} value={option}>
-                  {STATUS_META[option].label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="relative">
+            <Select
+              value={status}
+              onValueChange={(value) => onStatusChange(asStatusFilter(value))}
+            >
+              <SelectTrigger
+                aria-label="Filter by status"
+                className={cn(
+                  "w-full sm:w-40",
+                  status !== "all" && "[&>svg]:invisible",
+                )}
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All statuses</SelectItem>
+                {STATUS_ORDER.map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {STATUS_META[option].label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {status !== "all" ? (
+              <button
+                type="button"
+                aria-label="Clear status filter"
+                onClick={() => onStatusChange("all")}
+                className="absolute top-1/2 right-2 flex size-4 -translate-y-1/2 cursor-pointer items-center justify-center rounded-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+              >
+                <X className="size-4" />
+              </button>
+            ) : null}
+          </div>
         </div>
 
         <div className="grid gap-1.5">
           <Label className="text-xs text-muted-foreground">Priority</Label>
-          <Select
-            value={priority}
-            onValueChange={(value) => onPriorityChange(asPriorityFilter(value))}
-          >
-            <SelectTrigger
-              aria-label="Filter by priority"
-              className="w-full sm:w-40"
+          <div className="relative">
+            <Select
+              value={priority}
+              onValueChange={(value) => onPriorityChange(asPriorityFilter(value))}
             >
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All priorities</SelectItem>
-              {PRIORITY_ORDER.map((option) => (
-                <SelectItem key={option} value={option}>
-                  {PRIORITY_META[option].label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+              <SelectTrigger
+                aria-label="Filter by priority"
+                className={cn(
+                  "w-full sm:w-40",
+                  priority !== "all" && "[&>svg]:invisible",
+                )}
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All priorities</SelectItem>
+                {PRIORITY_ORDER.map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {PRIORITY_META[option].label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {priority !== "all" ? (
+              <button
+                type="button"
+                aria-label="Clear priority filter"
+                onClick={() => onPriorityChange("all")}
+                className="absolute top-1/2 right-2 flex size-4 -translate-y-1/2 cursor-pointer items-center justify-center rounded-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+              >
+                <X className="size-4" />
+              </button>
+            ) : null}
+          </div>
         </div>
 
         <div className="grid gap-1.5">

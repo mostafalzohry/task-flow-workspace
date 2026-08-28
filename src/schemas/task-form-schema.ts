@@ -1,7 +1,7 @@
 import * as yup from "yup";
 
-import { PRIORITY_ORDER, STATUS_ORDER } from "../config";
-import type { TaskPriority, TaskStatus } from "../types";
+import { PRIORITY_ORDER, STATUS_ORDER } from "@/config";
+import type { TaskPriority, TaskStatus } from "@/types";
 
 export const TITLE_MAX_LENGTH = 120;
 export const DESCRIPTION_MAX_LENGTH = 2000;

@@ -1,4 +1,4 @@
-import type { TaskListQuery } from "../types";
+import type { TaskListQuery } from "@/types";
 
 export const taskKeys = {
   all: ["tasks"] as const,

@@ -1,5 +1,5 @@
-import type { TaskFormValues } from "../schemas/task-form-schema";
-import type { CreateTaskInput, Task, UpdateTaskInput } from "../types";
+import type { TaskFormValues } from "@/schemas/task-form-schema";
+import type { CreateTaskInput, Task, UpdateTaskInput } from "@/types";
 
 function toApiDueDate(dateOnly: string): string {
   return new Date(`${dateOnly}T00:00:00.000Z`).toISOString();

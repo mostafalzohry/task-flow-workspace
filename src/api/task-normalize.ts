@@ -1,5 +1,5 @@
-import { PRIORITY_ORDER, STATUS_ORDER } from "../config";
-import type { Task, TaskPriority, TaskStatus } from "../types";
+import { PRIORITY_ORDER, STATUS_ORDER } from "@/config";
+import type { Task, TaskPriority, TaskStatus } from "@/types";
 
 class InvalidRecordError extends Error {}
 

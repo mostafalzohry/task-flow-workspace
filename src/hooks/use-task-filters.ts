@@ -10,7 +10,7 @@ import type {
   StatusFilter,
   TaskFilters,
   TaskListQuery,
-} from "../types";
+} from "@/types";
 import {
   filtersCleared,
   filtersReplaced,
@@ -20,8 +20,8 @@ import {
   selectTaskFilters,
   statusChanged,
   toDateChanged,
-} from "../store/task-filters-slice";
-import { buildTaskFilterQuery, parseTaskFilters } from "../utils/task-filters";
+} from "@/store/task-filters-slice";
+import { buildTaskFilterQuery, parseTaskFilters } from "@/utils/task-filters";
 
 const SEARCH_DEBOUNCE_MS = 300;
 

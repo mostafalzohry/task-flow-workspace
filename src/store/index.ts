@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 
-import { taskFiltersReducer } from "@/features/tasks/store/task-filters-slice";
+import { taskFiltersReducer } from "./task-filters-slice";
 
 export const makeStore = () =>
   configureStore({

@@ -13,13 +13,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { PRIORITY_META, PRIORITY_ORDER, STATUS_META, STATUS_ORDER } from "../config";
+import { PRIORITY_META, PRIORITY_ORDER, STATUS_META, STATUS_ORDER } from "@/config";
 import {
   DESCRIPTION_MAX_LENGTH,
   TITLE_MAX_LENGTH,
   taskFormSchema,
   type TaskFormValues,
-} from "../schemas/task-form-schema";
+} from "@/schemas/task-form-schema";
 
 interface TaskFormProps {
   formId: string;

@@ -12,8 +12,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useDeleteTask } from "../queries/use-task-mutations";
-import type { Task } from "../types";
+import { useDeleteTask } from "@/queries/use-task-mutations";
+import type { Task } from "@/types";
 
 interface DeleteTaskDialogProps {
   open: boolean;

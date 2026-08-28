@@ -17,19 +17,25 @@ import {
   formValuesToCreateInput,
   formValuesToUpdateInput,
   taskToFormValues,
-} from "../utils/task-payload";
-import { useCreateTask, useUpdateTask } from "../queries/use-task-mutations";
-import type { TaskFormValues } from "../schemas/task-form-schema";
-import type { Task } from "../types";
+} from "@/utils/task-payload";
+import { useCreateTask, useUpdateTask } from "@/queries/use-task-mutations";
+import type { TaskFormValues } from "@/schemas/task-form-schema";
+import type { Task, TaskStatus } from "@/types";
 import TaskForm from "./task-form";
 
 interface TaskDialogProps {
   open: boolean;
   task: Task | null;
+  createStatus?: TaskStatus;
   onOpenChange: (open: boolean) => void;
 }
 
-const TaskDialog = ({ open, task, onOpenChange }: TaskDialogProps) => {
+const TaskDialog = ({
+  open,
+  task,
+  createStatus = "todo",
+  onOpenChange,
+}: TaskDialogProps) => {
   const formId = "task-form";
   const createTask = useCreateTask();
   const updateTask = useUpdateTask();
@@ -93,9 +99,13 @@ const TaskDialog = ({ open, task, onOpenChange }: TaskDialogProps) => {
         </DialogHeader>
 
         <TaskForm
-          key={open ? (task?.id ?? "create") : "closed"}
+          key={open ? (task?.id ?? `create-${createStatus}`) : "closed"}
           formId={formId}
-          defaultValues={task ? taskToFormValues(task) : EMPTY_TASK_FORM_VALUES}
+          defaultValues={
+            task
+              ? taskToFormValues(task)
+              : { ...EMPTY_TASK_FORM_VALUES, status: createStatus }
+          }
           isSubmitting={mutation.isPending}
           onSubmit={isEditing ? handleUpdate : handleCreate}
         />

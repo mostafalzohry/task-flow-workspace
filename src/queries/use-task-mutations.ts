@@ -3,8 +3,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { createTask, deleteTask, updateTask } from "../api/task-service";
-import type { CreateTaskInput, Task, TaskStatus, UpdateTaskInput } from "../types";
+import { createTask, deleteTask, updateTask } from "@/api/task-service";
+import type { CreateTaskInput, Task, TaskStatus, UpdateTaskInput } from "@/types";
 import { taskKeys } from "./task-keys";
 
 export function useCreateTask() {

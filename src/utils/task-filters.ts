@@ -1,5 +1,5 @@
-import { PRIORITY_ORDER, STATUS_ORDER } from "../config";
-import type { PriorityFilter, StatusFilter, Task, TaskFilters } from "../types";
+import { PRIORITY_ORDER, STATUS_ORDER } from "@/config";
+import type { PriorityFilter, StatusFilter, Task, TaskFilters } from "@/types";
 
 const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 

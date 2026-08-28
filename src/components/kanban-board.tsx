@@ -7,15 +7,11 @@ import {
   KeyboardSensor,
   PointerSensor,
   TouchSensor,
-  closestCorners,
-  pointerWithin,
-  rectIntersection,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
 import type {
   Announcements,
-  CollisionDetection,
   DragEndEvent,
   DragStartEvent,
   ScreenReaderInstructions,
@@ -23,9 +19,11 @@ import type {
 } from "@dnd-kit/core";
 import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 
-import { STATUS_META, STATUS_ORDER } from "../config";
-import { useMoveTask } from "../queries/use-task-mutations";
-import type { Task, TaskStatus } from "../types";
+import { STATUS_META, STATUS_ORDER } from "@/config";
+import { useMoveTask } from "@/queries/use-task-mutations";
+import type { Task, TaskStatus } from "@/types";
+import { collisionDetection, readStatus } from "@/utils/kanban-dnd";
+import { groupByStatus } from "@/utils/task-grouping";
 import KanbanColumn from "./kanban-column";
 import TaskCardBody from "./task-card-body";
 
@@ -33,6 +31,7 @@ interface KanbanBoardProps {
   tasks: readonly Task[];
   onEditTask: (task: Task) => void;
   onDeleteTask: (task: Task) => void;
+  onCreateTask: (status: TaskStatus) => void;
 }
 
 const screenReaderInstructions: ScreenReaderInstructions = {
@@ -40,43 +39,12 @@ const screenReaderInstructions: ScreenReaderInstructions = {
     "Press space or enter to pick up a task. Use the arrow keys to move it between columns. Press space or enter again to drop it, or press escape to cancel.",
 };
 
-function groupByStatus(tasks: readonly Task[]): Record<TaskStatus, Task[]> {
-  const groups: Record<TaskStatus, Task[]> = {
-    todo: [],
-    "in-progress": [],
-    "in-review": [],
-    done: [],
-  };
-
-  for (const task of tasks) {
-    groups[task.status].push(task);
-  }
-
-  return groups;
-}
-
-function readStatus(
-  data: Record<string, unknown> | null | undefined,
-): TaskStatus | null {
-  if (!data) {
-    return null;
-  }
-  return STATUS_ORDER.find((status) => status === data.status) ?? null;
-}
-
-const collisionDetection: CollisionDetection = (args) => {
-  const pointerCollisions = pointerWithin(args);
-  if (pointerCollisions.length > 0) {
-    return pointerCollisions;
-  }
-  const rectCollisions = rectIntersection(args);
-  if (rectCollisions.length > 0) {
-    return rectCollisions;
-  }
-  return closestCorners(args);
-};
-
-const KanbanBoard = ({ tasks, onEditTask, onDeleteTask }: KanbanBoardProps) => {
+const KanbanBoard = ({
+  tasks,
+  onEditTask,
+  onDeleteTask,
+  onCreateTask,
+}: KanbanBoardProps) => {
   const grouped = groupByStatus(tasks);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const moveTask = useMoveTask();
@@ -162,6 +130,7 @@ const KanbanBoard = ({ tasks, onEditTask, onDeleteTask }: KanbanBoardProps) => {
             tasks={grouped[status]}
             onEditTask={onEditTask}
             onDeleteTask={onDeleteTask}
+            onAddTask={onCreateTask}
           />
         ))}
       </div>

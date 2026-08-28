@@ -1,5 +1,6 @@
 "use client";
 
+import { Plus } from "lucide-react";
 import { useDroppable } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -7,8 +8,9 @@ import {
 } from "@dnd-kit/sortable";
 
 import { Badge } from "@/components/ui/badge";
-import { STATUS_META } from "../config";
-import type { Task, TaskStatus } from "../types";
+import { Button } from "@/components/ui/button";
+import { STATUS_META } from "@/config";
+import type { Task, TaskStatus } from "@/types";
 import TaskCard from "./task-card";
 
 interface KanbanColumnProps {
@@ -16,6 +18,7 @@ interface KanbanColumnProps {
   tasks: readonly Task[];
   onEditTask: (task: Task) => void;
   onDeleteTask: (task: Task) => void;
+  onAddTask: (status: TaskStatus) => void;
 }
 
 const KanbanColumn = ({
@@ -23,6 +26,7 @@ const KanbanColumn = ({
   tasks,
   onEditTask,
   onDeleteTask,
+  onAddTask,
 }: KanbanColumnProps) => {
   const { label, indicatorClassName } = STATUS_META[status];
   const headingId = `column-${status}`;
@@ -49,6 +53,15 @@ const KanbanColumn = ({
         <Badge variant="secondary" className="ml-auto">
           {tasks.length}
         </Badge>
+        <Button
+          type="button"
+          size="icon-sm"
+          variant="ghost"
+          aria-label={`Add a task to ${label}`}
+          onClick={() => onAddTask(status)}
+        >
+          <Plus />
+        </Button>
       </div>
 
       <SortableContext

@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-import type { PriorityFilter, StatusFilter, TaskFilters } from "../types";
+import type { PriorityFilter, StatusFilter, TaskFilters } from "@/types";
 
 const initialState: TaskFilters = {
   search: "",
