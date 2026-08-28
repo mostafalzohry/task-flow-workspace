@@ -1,49 +1,29 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import type {
   PriorityFilter,
   StatusFilter,
   TaskFilters,
   TaskListQuery,
 } from "../types";
-import { asPriorityFilter, asStatusFilter } from "../utils/task-filters";
-import { useDebouncedValue } from "@/hooks/use-debounced-value";
+import {
+  filtersCleared,
+  filtersReplaced,
+  fromDateChanged,
+  priorityChanged,
+  searchChanged,
+  selectTaskFilters,
+  statusChanged,
+  toDateChanged,
+} from "../store/task-filters-slice";
+import { buildTaskFilterQuery, parseTaskFilters } from "../utils/task-filters";
 
 const SEARCH_DEBOUNCE_MS = 300;
-const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
-
-function parseDate(value: string | null): string {
-  if (!value || !ISO_DATE_PATTERN.test(value)) {
-    return "";
-  }
-  return Number.isNaN(new Date(value).getTime()) ? "" : value;
-}
-
-function readFilters(params: URLSearchParams): TaskFilters {
-  return {
-    search: (params.get("q") ?? "").trim(),
-    status: asStatusFilter(params.get("status")),
-    priority: asPriorityFilter(params.get("priority")),
-    from: parseDate(params.get("from")),
-    to: parseDate(params.get("to")),
-  };
-}
-
-function setParam(
-  params: URLSearchParams,
-  key: string,
-  value: string,
-  defaultValue: string,
-): void {
-  if (value === "" || value === defaultValue) {
-    params.delete(key);
-  } else {
-    params.set(key, value);
-  }
-}
 
 export interface UseTaskFiltersResult {
   searchInput: string;
@@ -69,108 +49,100 @@ export function useTaskFilters(): UseTaskFiltersResult {
   const searchParams = useSearchParams();
   const searchParamsString = searchParams.toString();
 
-  const urlFilters = useMemo(
-    () => readFilters(new URLSearchParams(searchParamsString)),
-    [searchParamsString],
-  );
+  const dispatch = useAppDispatch();
+  const filters = useAppSelector(selectTaskFilters);
 
-  const [searchInput, setSearchInput] = useState(urlFilters.search);
-  const [syncedUrlSearch, setSyncedUrlSearch] = useState(urlFilters.search);
+  const [hydratedFromUrl, setHydratedFromUrl] = useState(false);
+  const [searchInput, setSearchInput] = useState(filters.search);
+  const [syncedSearch, setSyncedSearch] = useState(filters.search);
   const appliedSearch = useDebouncedValue(searchInput.trim(), SEARCH_DEBOUNCE_MS);
 
-  if (urlFilters.search !== syncedUrlSearch) {
-    setSyncedUrlSearch(urlFilters.search);
-    if (urlFilters.search !== searchInput.trim()) {
-      setSearchInput(urlFilters.search);
+  if (filters.search !== syncedSearch) {
+    setSyncedSearch(filters.search);
+    if (filters.search !== searchInput.trim()) {
+      setSearchInput(filters.search);
     }
   }
 
-  const commit = useCallback(
-    (patch: Partial<TaskFilters>) => {
-      const params = new URLSearchParams(searchParamsString);
-      const next = { ...readFilters(params), ...patch };
-      setParam(params, "q", next.search, "");
-      setParam(params, "status", next.status, "all");
-      setParam(params, "priority", next.priority, "all");
-      setParam(params, "from", next.from, "");
-      setParam(params, "to", next.to, "");
-      const nextString = params.toString();
-      if (nextString === searchParamsString) {
-        return;
-      }
-      router.replace(nextString ? `${pathname}?${nextString}` : pathname, {
-        scroll: false,
-      });
-    },
-    [pathname, router, searchParamsString],
-  );
+  useEffect(() => {
+    dispatch(filtersReplaced(parseTaskFilters(searchParamsString)));
+  }, [searchParamsString, dispatch]);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => setHydratedFromUrl(true), 0);
+    return () => window.clearTimeout(timeout);
+  }, []);
+
+  useEffect(() => {
+    if (!hydratedFromUrl) {
+      return;
+    }
+    const current = window.location.search.replace(/^\?/, "");
+    const next = buildTaskFilterQuery(current, filters);
+    if (next === current) {
+      return;
+    }
+    router.replace(next ? `${pathname}?${next}` : pathname, { scroll: false });
+  }, [hydratedFromUrl, filters, pathname, router]);
 
   useEffect(() => {
     if (appliedSearch !== searchInput.trim()) {
       return;
     }
-    if (appliedSearch === urlFilters.search) {
+    if (appliedSearch === filters.search) {
       return;
     }
-    commit({ search: appliedSearch });
-  }, [appliedSearch, searchInput, urlFilters.search, commit]);
+    dispatch(searchChanged(appliedSearch));
+  }, [appliedSearch, searchInput, filters.search, dispatch]);
 
-  const clearFilters = useCallback(() => {
+  const clearFilters = () => {
     setSearchInput("");
-    commit({ search: "", status: "all", priority: "all", from: "", to: "" });
-  }, [commit]);
+    dispatch(filtersCleared());
+  };
 
   const dateRangeError =
-    urlFilters.from !== "" &&
-    urlFilters.to !== "" &&
-    urlFilters.from > urlFilters.to
+    filters.from !== "" && filters.to !== "" && filters.from > filters.to
       ? "The From date must be on or before the To date."
       : null;
 
   const hasActiveFilters =
     searchInput.trim() !== "" ||
-    urlFilters.status !== "all" ||
-    urlFilters.priority !== "all" ||
-    urlFilters.from !== "" ||
-    urlFilters.to !== "";
+    filters.status !== "all" ||
+    filters.priority !== "all" ||
+    filters.from !== "" ||
+    filters.to !== "";
 
   const serverQuery = useMemo<TaskListQuery>(
     () => ({
-      search: urlFilters.search,
-      status: urlFilters.status,
-      priority: urlFilters.priority,
+      search: filters.search,
+      status: filters.status,
+      priority: filters.priority,
     }),
-    [urlFilters.search, urlFilters.status, urlFilters.priority],
+    [filters.search, filters.status, filters.priority],
   );
 
   const appliedFilters = useMemo<TaskFilters>(
     () => ({
-      search: urlFilters.search,
-      status: urlFilters.status,
-      priority: urlFilters.priority,
-      from: urlFilters.from,
-      to: urlFilters.to,
+      search: filters.search,
+      status: filters.status,
+      priority: filters.priority,
+      from: filters.from,
+      to: filters.to,
     }),
-    [
-      urlFilters.search,
-      urlFilters.status,
-      urlFilters.priority,
-      urlFilters.from,
-      urlFilters.to,
-    ],
+    [filters.search, filters.status, filters.priority, filters.from, filters.to],
   );
 
   return {
     searchInput,
     setSearchInput,
-    status: urlFilters.status,
-    setStatus: (value) => commit({ status: value }),
-    priority: urlFilters.priority,
-    setPriority: (value) => commit({ priority: value }),
-    from: urlFilters.from,
-    setFrom: (value) => commit({ from: value }),
-    to: urlFilters.to,
-    setTo: (value) => commit({ to: value }),
+    status: filters.status,
+    setStatus: (value) => dispatch(statusChanged(value)),
+    priority: filters.priority,
+    setPriority: (value) => dispatch(priorityChanged(value)),
+    from: filters.from,
+    setFrom: (value) => dispatch(fromDateChanged(value)),
+    to: filters.to,
+    setTo: (value) => dispatch(toDateChanged(value)),
     clearFilters,
     hasActiveFilters,
     dateRangeError,

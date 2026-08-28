@@ -35,13 +35,15 @@ const KanbanBoardEmpty = ({
         </p>
       </div>
       {isNoResults ? (
-        <Button variant="outline" onClick={onClearFilters}>
-          <FilterX />
+        <Button
+          variant="outline"
+          onClick={onClearFilters}
+          startIcon={<FilterX />}
+        >
           Clear filters
         </Button>
       ) : (
-        <Button onClick={onCreate}>
-          <Plus />
+        <Button onClick={onCreate} startIcon={<Plus />}>
           Add task
         </Button>
       )}

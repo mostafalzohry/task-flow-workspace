@@ -157,8 +157,8 @@ const TaskToolbar = ({
             variant="ghost"
             className="w-full sm:w-auto"
             onClick={onClearFilters}
+            startIcon={<FilterX />}
           >
-            <FilterX />
             Clear filters
           </Button>
         ) : null}

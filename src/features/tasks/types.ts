@@ -18,6 +18,7 @@ export interface CreateTaskInput {
   status: TaskStatus;
   priority: TaskPriority;
   dueDate: string;
+  createdAt: string;
 }
 
 export type UpdateTaskInput = Partial<CreateTaskInput>;

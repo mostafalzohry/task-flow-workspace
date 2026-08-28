@@ -5,9 +5,7 @@ function toApiDueDate(dateOnly: string): string {
   return new Date(`${dateOnly}T00:00:00.000Z`).toISOString();
 }
 
-export function formValuesToCreateInput(
-  values: TaskFormValues,
-): CreateTaskInput {
+function toTaskFields(values: TaskFormValues) {
   return {
     title: values.title.trim(),
     description: values.description.trim(),
@@ -17,10 +15,19 @@ export function formValuesToCreateInput(
   };
 }
 
+export function formValuesToCreateInput(
+  values: TaskFormValues,
+): CreateTaskInput {
+  return {
+    ...toTaskFields(values),
+    createdAt: new Date().toISOString(),
+  };
+}
+
 export function formValuesToUpdateInput(
   values: TaskFormValues,
 ): UpdateTaskInput {
-  return formValuesToCreateInput(values);
+  return toTaskFields(values);
 }
 
 export function taskToFormValues(task: Task): TaskFormValues {

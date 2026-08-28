@@ -1,3 +1,11 @@
+"use client";
+
+import { useDroppable } from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+
 import { Badge } from "@/components/ui/badge";
 import { STATUS_META } from "../config";
 import type { Task, TaskStatus } from "../types";
@@ -18,11 +26,17 @@ const KanbanColumn = ({
 }: KanbanColumnProps) => {
   const { label, indicatorClassName } = STATUS_META[status];
   const headingId = `column-${status}`;
+  const { setNodeRef, isOver } = useDroppable({
+    id: status,
+    data: { type: "column", status },
+  });
 
   return (
     <section
+      ref={setNodeRef}
       aria-labelledby={headingId}
-      className="flex flex-col gap-3 rounded-xl border border-border bg-muted/40 p-3"
+      data-drop-active={isOver || undefined}
+      className="flex flex-col gap-3 rounded-xl border border-border bg-muted/40 p-3 transition-colors data-[drop-active]:border-primary data-[drop-active]:bg-primary/10 data-[drop-active]:ring-2 data-[drop-active]:ring-primary data-[drop-active]:ring-inset"
     >
       <div className="flex items-center gap-2">
         <span
@@ -37,17 +51,22 @@ const KanbanColumn = ({
         </Badge>
       </div>
 
-      <ul className="flex flex-col gap-3">
-        {tasks.map((task) => (
-          <li key={task.id}>
-            <TaskCard
-              task={task}
-              onEditTask={onEditTask}
-              onDeleteTask={onDeleteTask}
-            />
-          </li>
-        ))}
-      </ul>
+      <SortableContext
+        items={tasks.map((task) => task.id)}
+        strategy={verticalListSortingStrategy}
+      >
+        <ul className="flex min-h-14 flex-col gap-3">
+          {tasks.map((task) => (
+            <li key={task.id}>
+              <TaskCard
+                task={task}
+                onEditTask={onEditTask}
+                onDeleteTask={onDeleteTask}
+              />
+            </li>
+          ))}
+        </ul>
+      </SortableContext>
     </section>
   );
 };

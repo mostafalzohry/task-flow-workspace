@@ -25,8 +25,14 @@ const KanbanBoardError = ({
         <p className="text-sm font-medium">Something went wrong</p>
         <p className="max-w-sm text-sm text-muted-foreground">{message}</p>
       </div>
-      <Button onClick={onRetry} disabled={isRetrying} variant="outline">
-        <RefreshCw className={isRetrying ? "animate-spin" : undefined} />
+      <Button
+        onClick={onRetry}
+        disabled={isRetrying}
+        variant="outline"
+        startIcon={
+          <RefreshCw className={isRetrying ? "animate-spin" : ""} />
+        }
+      >
         {isRetrying ? "Retrying..." : "Retry"}
       </Button>
     </div>

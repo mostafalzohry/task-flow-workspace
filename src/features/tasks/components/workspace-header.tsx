@@ -26,8 +26,12 @@ const WorkspaceHeader = ({ onAddTask }: WorkspaceHeaderProps) => {
         </div>
       </div>
 
-      <Button size="lg" className="w-full sm:w-auto" onClick={onAddTask}>
-        <Plus />
+      <Button
+        size="lg"
+        className="w-full sm:w-auto"
+        onClick={onAddTask}
+        startIcon={<Plus />}
+      >
         Add task
       </Button>
     </header>
