@@ -1,13 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
-import {
-  CalendarDays,
-  GripVertical,
-  MoreVertical,
-  Pencil,
-  Trash2,
-} from "lucide-react";
+import { CalendarDays, MoreVertical, Pencil, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,7 +26,6 @@ interface TaskCardBodyProps {
   task: Task;
   onEditTask: (task: Task) => void;
   onDeleteTask: (task: Task) => void;
-  dragHandle?: ReactNode;
   isOverlay?: boolean;
 }
 
@@ -41,7 +33,6 @@ const TaskCardBody = ({
   task,
   onEditTask,
   onDeleteTask,
-  dragHandle,
   isOverlay = false,
 }: TaskCardBodyProps) => {
   const priority = PRIORITY_META[task.priority];
@@ -52,19 +43,7 @@ const TaskCardBody = ({
       className={isOverlay ? "ring-border cursor-grabbing shadow-xl" : "ring-border"}
     >
       <CardHeader className="gap-1">
-        <div className="flex items-start gap-1.5">
-          {dragHandle ?? (
-            <span
-              aria-hidden="true"
-              className="mt-0.5 -ml-0.5 shrink-0 p-0.5 text-muted-foreground"
-            >
-              <GripVertical className="size-4" />
-            </span>
-          )}
-          <CardTitle className="min-w-0 line-clamp-2 wrap-anywhere">
-            {task.title}
-          </CardTitle>
-        </div>
+        <CardTitle className="line-clamp-2 wrap-anywhere">{task.title}</CardTitle>
         <CardDescription className="line-clamp-2 text-xs wrap-anywhere">
           {task.description}
         </CardDescription>
@@ -75,6 +54,7 @@ const TaskCardBody = ({
                 size="icon-sm"
                 variant="ghost"
                 aria-label={`Actions for “${task.title}”`}
+                onPointerDown={(event) => event.stopPropagation()}
               >
                 <MoreVertical />
               </Button>

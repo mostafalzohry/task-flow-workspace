@@ -1,9 +1,11 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeftRight } from "lucide-react";
 import { toast } from "sonner";
 
 import { createTask, deleteTask, updateTask } from "@/api/task-service";
+import { STATUS_META } from "@/config";
 import type { CreateTaskInput, Task, TaskStatus, UpdateTaskInput } from "@/types";
 import { taskKeys } from "./task-keys";
 
@@ -69,8 +71,10 @@ export function useMoveTask() {
       }
       toast.error("We couldn't move the task. Please try again.");
     },
-    onSuccess: () => {
-      toast.success("Task moved.");
+    onSuccess: (task) => {
+      toast.info(`“${task.title}” moved to ${STATUS_META[task.status].label}`, {
+        icon: <ArrowLeftRight className="size-4" />,
+      });
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: taskKeys.lists() });

@@ -1,5 +1,6 @@
 "use client";
 
+import { Pencil, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -52,7 +53,9 @@ const TaskDialog = ({
     }
     createTask.mutate(formValuesToCreateInput(values), {
       onSuccess: () => {
-        toast.success("Task created.");
+        toast.success(`“${values.title.trim()}” created`, {
+          icon: <Plus className="size-4" />,
+        });
         onOpenChange(false);
       },
       onError: (error) => {
@@ -69,7 +72,9 @@ const TaskDialog = ({
       { id: task.id, input: formValuesToUpdateInput(values) },
       {
         onSuccess: () => {
-          toast.success("Task updated.");
+          toast.info(`“${values.title.trim()}” updated`, {
+            icon: <Pencil className="size-4" />,
+          });
           onOpenChange(false);
         },
         onError: (error) => {

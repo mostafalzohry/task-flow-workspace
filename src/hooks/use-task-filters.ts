@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -24,6 +24,13 @@ import {
 import { buildTaskFilterQuery, parseTaskFilters } from "@/utils/task-filters";
 
 const SEARCH_DEBOUNCE_MS = 300;
+const CLEARED_FILTERS: TaskFilters = {
+  search: "",
+  status: "all",
+  priority: "all",
+  from: "",
+  to: "",
+};
 
 export interface UseTaskFiltersResult {
   searchInput: string;
@@ -52,7 +59,6 @@ export function useTaskFilters(): UseTaskFiltersResult {
   const dispatch = useAppDispatch();
   const filters = useAppSelector(selectTaskFilters);
 
-  const [hydratedFromUrl, setHydratedFromUrl] = useState(false);
   const [searchInput, setSearchInput] = useState(filters.search);
   const [syncedSearch, setSyncedSearch] = useState(filters.search);
   const appliedSearch = useDebouncedValue(searchInput.trim(), SEARCH_DEBOUNCE_MS);
@@ -68,22 +74,17 @@ export function useTaskFilters(): UseTaskFiltersResult {
     dispatch(filtersReplaced(parseTaskFilters(searchParamsString)));
   }, [searchParamsString, dispatch]);
 
-  useEffect(() => {
-    const timeout = window.setTimeout(() => setHydratedFromUrl(true), 0);
-    return () => window.clearTimeout(timeout);
-  }, []);
+  const updateUrl = useCallback(
+    (nextFilters: TaskFilters) => {
+      const next = buildTaskFilterQuery(searchParamsString, nextFilters);
+      if (next === searchParamsString) {
+        return;
+      }
 
-  useEffect(() => {
-    if (!hydratedFromUrl) {
-      return;
-    }
-    const current = window.location.search.replace(/^\?/, "");
-    const next = buildTaskFilterQuery(current, filters);
-    if (next === current) {
-      return;
-    }
-    router.replace(next ? `${pathname}?${next}` : pathname, { scroll: false });
-  }, [hydratedFromUrl, filters, pathname, router]);
+      router.replace(next ? `${pathname}?${next}` : pathname, { scroll: false });
+    },
+    [pathname, router, searchParamsString],
+  );
 
   useEffect(() => {
     if (appliedSearch !== searchInput.trim()) {
@@ -92,12 +93,40 @@ export function useTaskFilters(): UseTaskFiltersResult {
     if (appliedSearch === filters.search) {
       return;
     }
+
+    const nextFilters = { ...filters, search: appliedSearch };
     dispatch(searchChanged(appliedSearch));
-  }, [appliedSearch, searchInput, filters.search, dispatch]);
+    updateUrl(nextFilters);
+  }, [appliedSearch, searchInput, filters, dispatch, updateUrl]);
+
+  const setStatus = (value: StatusFilter) => {
+    const nextFilters = { ...filters, status: value };
+    dispatch(statusChanged(value));
+    updateUrl(nextFilters);
+  };
+
+  const setPriority = (value: PriorityFilter) => {
+    const nextFilters = { ...filters, priority: value };
+    dispatch(priorityChanged(value));
+    updateUrl(nextFilters);
+  };
+
+  const setFrom = (value: string) => {
+    const nextFilters = { ...filters, from: value };
+    dispatch(fromDateChanged(value));
+    updateUrl(nextFilters);
+  };
+
+  const setTo = (value: string) => {
+    const nextFilters = { ...filters, to: value };
+    dispatch(toDateChanged(value));
+    updateUrl(nextFilters);
+  };
 
   const clearFilters = () => {
     setSearchInput("");
     dispatch(filtersCleared());
+    updateUrl(CLEARED_FILTERS);
   };
 
   const dateRangeError =
@@ -136,13 +165,13 @@ export function useTaskFilters(): UseTaskFiltersResult {
     searchInput,
     setSearchInput,
     status: filters.status,
-    setStatus: (value) => dispatch(statusChanged(value)),
+    setStatus,
     priority: filters.priority,
-    setPriority: (value) => dispatch(priorityChanged(value)),
+    setPriority,
     from: filters.from,
-    setFrom: (value) => dispatch(fromDateChanged(value)),
+    setFrom,
     to: filters.to,
-    setTo: (value) => dispatch(toDateChanged(value)),
+    setTo,
     clearFilters,
     hasActiveFilters,
     dateRangeError,

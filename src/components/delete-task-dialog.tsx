@@ -1,5 +1,6 @@
 "use client";
 
+import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -28,9 +29,12 @@ const DeleteTaskDialog = ({ open, task, onClose }: DeleteTaskDialogProps) => {
     if (!task || deleteTask.isPending) {
       return;
     }
+    const { title } = task;
     deleteTask.mutate(task.id, {
       onSuccess: () => {
-        toast.success("Task deleted.");
+        toast(`“${title}” deleted`, {
+          icon: <Trash2 className="size-4" />,
+        });
         onClose();
       },
       onError: (error) => {
