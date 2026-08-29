@@ -6,7 +6,7 @@ import type { SortOrder, TaskFilters, TaskSortField } from "@/types";
 import { filterTasks } from "@/utils/task-filters";
 import { useTasksQuery } from "./use-tasks";
 
-export const TASK_PAGE_SIZE = 5;
+export const TASK_PAGE_SIZE = 25;
 
 interface UseTaskListArgs extends TaskFilters {
   sortBy: TaskSortField;
