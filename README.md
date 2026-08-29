@@ -11,7 +11,7 @@ optimistic status changes, and accessible dialogs and drag-and-drop.
 ## Quick Start
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/mostafalzohry/task-flow-workspace.git
 cd task-flow-workspace
 npm install
 npm run dev            # http://localhost:3000
