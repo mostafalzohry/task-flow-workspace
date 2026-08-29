@@ -18,9 +18,7 @@ npm run dev            # http://localhost:3000
 ```
 
 A working MockAPI base URL is committed in `.env`, so no configuration is needed
-to run the app. To point it at your own backend, copy `.env.example` to
-`.env.local` and set `NEXT_PUBLIC_MOCK_API_BASE_URL` (it is resolved and
-validated in `src/lib/env.ts`).
+to run the app.
 
 | Command | Purpose |
 | --- | --- |
