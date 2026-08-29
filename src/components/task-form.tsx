@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
@@ -17,7 +18,7 @@ import { PRIORITY_META, PRIORITY_ORDER, STATUS_META, STATUS_ORDER } from "@/conf
 import {
   DESCRIPTION_MAX_LENGTH,
   TITLE_MAX_LENGTH,
-  taskFormSchema,
+  buildTaskFormSchema,
   type TaskFormValues,
 } from "@/schemas/task-form-schema";
 
@@ -25,6 +26,7 @@ interface TaskFormProps {
   formId: string;
   defaultValues: TaskFormValues;
   isSubmitting: boolean;
+  minDueDate?: string;
   onSubmit: (values: TaskFormValues) => void;
 }
 
@@ -32,15 +34,21 @@ const TaskForm = ({
   formId,
   defaultValues,
   isSubmitting,
+  minDueDate,
   onSubmit,
 }: TaskFormProps) => {
+  const schema = useMemo(
+    () => buildTaskFormSchema({ minDueDate }),
+    [minDueDate],
+  );
+
   const {
     register,
     handleSubmit,
     control,
     formState: { errors },
   } = useForm<TaskFormValues>({
-    resolver: yupResolver(taskFormSchema),
+    resolver: yupResolver(schema),
     defaultValues,
     mode: "onTouched",
   });
@@ -178,6 +186,7 @@ const TaskForm = ({
           <Input
             id={fieldId("dueDate")}
             type="date"
+            min={minDueDate}
             className="w-full sm:w-52"
             aria-invalid={errors.dueDate ? true : undefined}
             aria-describedby={errors.dueDate ? errorId("dueDate") : undefined}

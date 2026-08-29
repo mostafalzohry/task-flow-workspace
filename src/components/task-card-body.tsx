@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, Eye, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { Eye, MoreVertical, Pencil, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,9 +18,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 import { PRIORITY_META } from "@/config";
-import { formatDate } from "@/utils/format";
 import type { Task } from "@/types";
+import { getDueDateStatus } from "@/utils/due-date";
+import DueDate from "./due-date";
 
 interface TaskCardBodyProps {
   task: Task;
@@ -38,11 +40,20 @@ const TaskCardBody = ({
   isOverlay = false,
 }: TaskCardBodyProps) => {
   const priority = PRIORITY_META[task.priority];
+  const dueStatus =
+    task.status === "done" ? "upcoming" : getDueDateStatus(task.dueDate);
 
   return (
     <Card
       size="sm"
-      className={isOverlay ? "ring-border cursor-grabbing shadow-xl" : "ring-border"}
+      className={cn(
+        "ring-border transition-colors",
+        isOverlay && "cursor-grabbing shadow-xl",
+        dueStatus === "overdue" &&
+          "border-l-[3px] border-l-destructive bg-destructive/5",
+        dueStatus === "soon" &&
+          "border-l-[3px] border-l-amber-500 bg-amber-500/5",
+      )}
     >
       <CardHeader className="gap-1">
         <CardTitle>
@@ -54,9 +65,11 @@ const TaskCardBody = ({
             {task.title}
           </Button>
         </CardTitle>
-        <CardDescription className="line-clamp-2 text-xs wrap-anywhere">
-          {task.description}
-        </CardDescription>
+        {task.description && (
+          <CardDescription className="line-clamp-2 text-xs wrap-anywhere">
+            {task.description}
+          </CardDescription>
+        )}
         <CardAction>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -91,10 +104,12 @@ const TaskCardBody = ({
       </CardHeader>
       <CardContent className="flex flex-wrap items-center justify-between gap-2">
         <Badge className={priority.badgeClassName}>{priority.label}</Badge>
-        <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-          <CalendarDays aria-hidden="true" className="size-3.5" />
-          <span>Due {formatDate(task.dueDate)}</span>
-        </span>
+        <DueDate
+          date={task.dueDate}
+          done={task.status === "done"}
+          prefix="Due"
+          className="text-xs"
+        />
       </CardContent>
     </Card>
   );

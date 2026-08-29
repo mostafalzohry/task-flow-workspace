@@ -24,7 +24,7 @@ import {
 } from "@/config";
 import { usePatchTask } from "@/queries/use-task-mutations";
 import type { SortOrder, Task, TaskSortField } from "@/types";
-import { formatDate } from "@/utils/format";
+import DueDate from "./due-date";
 import TaskTableSortHeader from "./task-table-sort-header";
 
 interface TaskTableProps {
@@ -92,9 +92,11 @@ const TaskTable = ({
                 >
                   {task.title}
                 </Button>
-                <p className="truncate text-xs text-muted-foreground">
-                  {task.description}
-                </p>
+                {task.description && (
+                  <p className="truncate text-xs text-muted-foreground">
+                    {task.description}
+                  </p>
+                )}
               </td>
               <td className="px-3 py-2 align-top">
                 <Select
@@ -148,8 +150,13 @@ const TaskTable = ({
                   </SelectContent>
                 </Select>
               </td>
-              <td className="px-3 py-2 align-top whitespace-nowrap text-muted-foreground">
-                {formatDate(task.dueDate)}
+              <td className="px-3 py-2 align-top whitespace-nowrap">
+                <DueDate
+                  date={task.dueDate}
+                  done={task.status === "done"}
+                  withIcon={false}
+                  className="text-sm"
+                />
               </td>
               <td className="px-3 py-2 align-top">
                 <DropdownMenu>

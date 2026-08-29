@@ -13,6 +13,7 @@ import {
 import { PRIORITY_META, STATUS_META } from "@/config";
 import { useTaskQuery } from "@/queries/use-task";
 import { formatDate } from "@/utils/format";
+import DueDate from "./due-date";
 import ErrorState from "./error-state";
 import TaskDetailsSkeleton from "./task-details-skeleton";
 
@@ -71,9 +72,13 @@ const TaskDetailsDialog = ({
         ) : task ? (
           <div className="space-y-5">
             <Field label="Description">
-              <p className="whitespace-pre-wrap wrap-anywhere text-foreground">
-                {task.description}
-              </p>
+              {task.description ? (
+                <p className="whitespace-pre-wrap wrap-anywhere text-foreground">
+                  {task.description}
+                </p>
+              ) : (
+                <p className="text-muted-foreground italic">No description</p>
+              )}
             </Field>
 
             <dl className="grid grid-cols-2 gap-4">
@@ -91,7 +96,13 @@ const TaskDetailsDialog = ({
                   {PRIORITY_META[task.priority].label}
                 </Badge>
               </Field>
-              <Field label="Due date">{formatDate(task.dueDate)}</Field>
+              <Field label="Due date">
+                <DueDate
+                  date={task.dueDate}
+                  done={task.status === "done"}
+                  withIcon={false}
+                />
+              </Field>
               <Field label="Created">{formatDate(task.createdAt)}</Field>
             </dl>
           </div>

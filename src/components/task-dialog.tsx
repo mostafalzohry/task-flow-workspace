@@ -22,6 +22,7 @@ import {
 import { useCreateTask, useUpdateTask } from "@/queries/use-task-mutations";
 import type { TaskFormValues } from "@/schemas/task-form-schema";
 import type { Task, TaskStatus } from "@/types";
+import { getTodayIso } from "@/utils/due-date";
 import TaskForm from "./task-form";
 
 interface TaskDialogProps {
@@ -43,6 +44,10 @@ const TaskDialog = ({
 
   const isEditing = task !== null;
   const mutation = isEditing ? updateTask : createTask;
+
+  const today = getTodayIso();
+  const minDueDate =
+    task && task.dueDate < today ? task.dueDate : today;
 
   const savingLabel = isEditing ? "Saving..." : "Creating...";
   const readyLabel = isEditing ? "Save changes" : "Create task";
@@ -99,7 +104,7 @@ const TaskDialog = ({
           <DialogDescription>
             {isEditing
               ? "Update the details for this task and save your changes."
-              : "Add a new task to your workspace. All fields are required."}
+              : "Add a new task to your workspace. Only the description is optional."}
           </DialogDescription>
         </DialogHeader>
 
@@ -112,6 +117,7 @@ const TaskDialog = ({
               : { ...EMPTY_TASK_FORM_VALUES, status: createStatus }
           }
           isSubmitting={mutation.isPending}
+          minDueDate={minDueDate}
           onSubmit={isEditing ? handleUpdate : handleCreate}
         />
 
