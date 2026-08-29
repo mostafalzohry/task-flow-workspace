@@ -60,6 +60,22 @@ export async function getTasks(params: TaskListParams): Promise<Task[]> {
   }
 }
 
+export async function getTaskById(id: string): Promise<Task> {
+  try {
+    const response = await httpClient.get<unknown>(`${TASKS_PATH}/${id}`);
+    const task = normalizeTask(response.data);
+    if (!task) {
+      throw new Error("We couldn't load this task. Please try again.");
+    }
+    return task;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      throw new Error("This task no longer exists.");
+    }
+    throw requestError(error, "We couldn't load this task. Please try again.");
+  }
+}
+
 export async function createTask(input: CreateTaskInput): Promise<Task> {
   try {
     const response = await httpClient.post<unknown>(TASKS_PATH, input);

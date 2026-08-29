@@ -103,14 +103,16 @@ const TaskToolbar = ({
               </SelectContent>
             </Select>
             {status !== "all" ? (
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon-xs"
                 aria-label="Clear status filter"
                 onClick={() => onStatusChange("all")}
-                className="absolute top-1/2 right-2 flex size-4 -translate-y-1/2 cursor-pointer items-center justify-center rounded-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                className="absolute top-1/2 right-1.5 -translate-y-1/2 text-muted-foreground hover:bg-transparent hover:text-foreground"
               >
-                <X className="size-4" />
-              </button>
+                <X className="size-3.5" />
+              </Button>
             ) : null}
           </div>
         </div>
@@ -141,14 +143,16 @@ const TaskToolbar = ({
               </SelectContent>
             </Select>
             {priority !== "all" ? (
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon-xs"
                 aria-label="Clear priority filter"
                 onClick={() => onPriorityChange("all")}
-                className="absolute top-1/2 right-2 flex size-4 -translate-y-1/2 cursor-pointer items-center justify-center rounded-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                className="absolute top-1/2 right-1.5 -translate-y-1/2 text-muted-foreground hover:bg-transparent hover:text-foreground"
               >
-                <X className="size-4" />
-              </button>
+                <X className="size-3.5" />
+              </Button>
             ) : null}
           </div>
         </div>

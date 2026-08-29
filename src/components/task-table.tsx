@@ -1,6 +1,6 @@
 "use client";
 
-import { MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { Eye, MoreVertical, Pencil, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -24,7 +24,7 @@ import {
 } from "@/config";
 import { usePatchTask } from "@/queries/use-task-mutations";
 import type { SortOrder, Task, TaskSortField } from "@/types";
-import { formatDueDate } from "@/utils/format";
+import { formatDate } from "@/utils/format";
 import TaskTableSortHeader from "./task-table-sort-header";
 
 interface TaskTableProps {
@@ -32,6 +32,7 @@ interface TaskTableProps {
   sortBy: TaskSortField;
   sortOrder: SortOrder;
   onSort: (field: TaskSortField) => void;
+  onViewTask: (task: Task) => void;
   onEditTask: (task: Task) => void;
   onDeleteTask: (task: Task) => void;
 }
@@ -41,6 +42,7 @@ const TaskTable = ({
   sortBy,
   sortOrder,
   onSort,
+  onViewTask,
   onEditTask,
   onDeleteTask,
 }: TaskTableProps) => {
@@ -83,7 +85,13 @@ const TaskTable = ({
               className="border-b border-border transition-colors last:border-0 hover:bg-muted/30"
             >
               <td className="max-w-[22rem] px-3 py-2 align-top">
-                <p className="truncate font-medium">{task.title}</p>
+                <Button
+                  variant="link"
+                  onClick={() => onViewTask(task)}
+                  className="block h-auto max-w-full truncate p-0 text-left text-sm font-medium text-foreground hover:text-foreground"
+                >
+                  {task.title}
+                </Button>
                 <p className="truncate text-xs text-muted-foreground">
                   {task.description}
                 </p>
@@ -141,7 +149,7 @@ const TaskTable = ({
                 </Select>
               </td>
               <td className="px-3 py-2 align-top whitespace-nowrap text-muted-foreground">
-                {formatDueDate(task.dueDate)}
+                {formatDate(task.dueDate)}
               </td>
               <td className="px-3 py-2 align-top">
                 <DropdownMenu>
@@ -155,6 +163,10 @@ const TaskTable = ({
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
+                    <DropdownMenuItem onSelect={() => onViewTask(task)}>
+                      <Eye />
+                      Details
+                    </DropdownMenuItem>
                     <DropdownMenuItem onSelect={() => onEditTask(task)}>
                       <Pencil />
                       Edit

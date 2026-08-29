@@ -2,6 +2,7 @@
 
 import { ArrowDown, ArrowUp, ChevronsUpDown } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
 import type { SortOrder, TaskSortField } from "@/types";
 
 interface TaskTableSortHeaderProps {
@@ -34,19 +35,17 @@ const TaskTableSortHeader = ({
         isActive ? (sortOrder === "asc" ? "ascending" : "descending") : "none"
       }
     >
-      <button
-        type="button"
+      <Button
+        variant="ghost"
         onClick={() => onSort(field)}
-        className="flex w-full items-center gap-1.5 px-3 py-2.5 text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+        className="h-auto w-full justify-start gap-1.5 rounded-none px-3 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground"
       >
         {label}
         <SortIcon
           aria-hidden="true"
-          className={
-            isActive ? "size-3.5 shrink-0" : "size-3.5 shrink-0 opacity-50"
-          }
+          className={isActive ? "size-3.5" : "size-3.5 opacity-50"}
         />
-      </button>
+      </Button>
     </th>
   );
 };

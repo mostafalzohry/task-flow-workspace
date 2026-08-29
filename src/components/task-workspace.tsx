@@ -8,11 +8,12 @@ import { useTaskList } from "@/queries/use-task-list";
 import { useTasksQuery } from "@/queries/use-tasks";
 import type { Task, TaskStatus } from "@/types";
 import DeleteTaskDialog from "./delete-task-dialog";
+import ErrorState from "./error-state";
 import KanbanBoard from "./kanban-board";
 import KanbanBoardEmpty from "./kanban-board-empty";
-import KanbanBoardError from "./kanban-board-error";
 import KanbanBoardSkeleton from "./kanban-board-skeleton";
 import TablePagination from "./table-pagination";
+import TaskDetailsDialog from "./task-details-dialog";
 import TaskDialog from "./task-dialog";
 import TaskTable from "./task-table";
 import TaskTableSkeleton from "./task-table-skeleton";
@@ -47,6 +48,8 @@ const TaskWorkspace = () => {
   const [createStatus, setCreateStatus] = useState<TaskStatus>("todo");
   const [deleteTarget, setDeleteTarget] = useState<Task | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [detailsTaskId, setDetailsTaskId] = useState<string | null>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   const openCreateInStatus = useCallback((status: TaskStatus) => {
     setTaskDialogTask(null);
@@ -67,6 +70,11 @@ const TaskWorkspace = () => {
   const openDelete = useCallback((task: Task) => {
     setDeleteTarget(task);
     setDeleteOpen(true);
+  }, []);
+
+  const openDetails = useCallback((task: Task) => {
+    setDetailsTaskId(task.id);
+    setDetailsOpen(true);
   }, []);
 
   const activeQuery = isListView ? list.query : boardQuery;
@@ -108,7 +116,7 @@ const TaskWorkspace = () => {
               <KanbanBoardSkeleton />
             )
           ) : activeQuery.isError ? (
-            <KanbanBoardError
+            <ErrorState
               message={
                 activeQuery.error instanceof Error
                   ? activeQuery.error.message
@@ -118,6 +126,7 @@ const TaskWorkspace = () => {
                 void activeQuery.refetch();
               }}
               isRetrying={activeQuery.isFetching}
+              className="rounded-xl border border-border bg-card px-6 py-12"
             />
           ) : displayTasks.length === 0 ? (
             isListView && filters.page > 1 ? (
@@ -155,6 +164,7 @@ const TaskWorkspace = () => {
                     sortBy={filters.sortBy}
                     sortOrder={filters.sortOrder}
                     onSort={filters.setSort}
+                    onViewTask={openDetails}
                     onEditTask={openEdit}
                     onDeleteTask={openDelete}
                   />
@@ -168,6 +178,7 @@ const TaskWorkspace = () => {
               ) : (
                 <KanbanBoard
                   tasks={displayTasks}
+                  onViewTask={openDetails}
                   onEditTask={openEdit}
                   onDeleteTask={openDelete}
                   onCreateTask={openCreateInStatus}
@@ -178,6 +189,11 @@ const TaskWorkspace = () => {
         </main>
       </div>
 
+      <TaskDetailsDialog
+        taskId={detailsTaskId}
+        open={detailsOpen}
+        onOpenChange={setDetailsOpen}
+      />
       <TaskDialog
         open={taskDialogOpen}
         task={taskDialogTask}

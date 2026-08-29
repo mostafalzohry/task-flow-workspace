@@ -9,11 +9,17 @@ import TaskCardBody from "./task-card-body";
 
 interface TaskCardProps {
   task: Task;
+  onViewTask: (task: Task) => void;
   onEditTask: (task: Task) => void;
   onDeleteTask: (task: Task) => void;
 }
 
-const TaskCard = ({ task, onEditTask, onDeleteTask }: TaskCardProps) => {
+const TaskCard = ({
+  task,
+  onViewTask,
+  onEditTask,
+  onDeleteTask,
+}: TaskCardProps) => {
   const { setNodeRef, attributes, listeners, transform, transition, isDragging } =
     useSortable({
       id: task.id,
@@ -34,6 +40,7 @@ const TaskCard = ({ task, onEditTask, onDeleteTask }: TaskCardProps) => {
     >
       <TaskCardBody
         task={task}
+        onViewTask={onViewTask}
         onEditTask={onEditTask}
         onDeleteTask={onDeleteTask}
       />

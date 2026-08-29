@@ -16,6 +16,7 @@ import TaskCard from "./task-card";
 interface KanbanColumnProps {
   status: TaskStatus;
   tasks: readonly Task[];
+  onViewTask: (task: Task) => void;
   onEditTask: (task: Task) => void;
   onDeleteTask: (task: Task) => void;
   onAddTask: (status: TaskStatus) => void;
@@ -24,6 +25,7 @@ interface KanbanColumnProps {
 const KanbanColumn = ({
   status,
   tasks,
+  onViewTask,
   onEditTask,
   onDeleteTask,
   onAddTask,
@@ -73,6 +75,7 @@ const KanbanColumn = ({
             <li key={task.id}>
               <TaskCard
                 task={task}
+                onViewTask={onViewTask}
                 onEditTask={onEditTask}
                 onDeleteTask={onDeleteTask}
               />

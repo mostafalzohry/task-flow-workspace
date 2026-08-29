@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { CalendarDays, Eye, MoreVertical, Pencil, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,11 +19,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { PRIORITY_META } from "@/config";
-import { formatDueDate } from "@/utils/format";
+import { formatDate } from "@/utils/format";
 import type { Task } from "@/types";
 
 interface TaskCardBodyProps {
   task: Task;
+  onViewTask: (task: Task) => void;
   onEditTask: (task: Task) => void;
   onDeleteTask: (task: Task) => void;
   isOverlay?: boolean;
@@ -31,6 +32,7 @@ interface TaskCardBodyProps {
 
 const TaskCardBody = ({
   task,
+  onViewTask,
   onEditTask,
   onDeleteTask,
   isOverlay = false,
@@ -43,7 +45,15 @@ const TaskCardBody = ({
       className={isOverlay ? "ring-border cursor-grabbing shadow-xl" : "ring-border"}
     >
       <CardHeader className="gap-1">
-        <CardTitle className="line-clamp-2 wrap-anywhere">{task.title}</CardTitle>
+        <CardTitle>
+          <Button
+            variant="link"
+            onClick={() => onViewTask(task)}
+            className="line-clamp-2 h-auto w-full justify-start whitespace-normal wrap-anywhere p-0 text-left text-sm font-semibold text-foreground hover:text-foreground"
+          >
+            {task.title}
+          </Button>
+        </CardTitle>
         <CardDescription className="line-clamp-2 text-xs wrap-anywhere">
           {task.description}
         </CardDescription>
@@ -60,6 +70,10 @@ const TaskCardBody = ({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem onSelect={() => onViewTask(task)}>
+                <Eye />
+                Details
+              </DropdownMenuItem>
               <DropdownMenuItem onSelect={() => onEditTask(task)}>
                 <Pencil />
                 Edit
@@ -79,7 +93,7 @@ const TaskCardBody = ({
         <Badge className={priority.badgeClassName}>{priority.label}</Badge>
         <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
           <CalendarDays aria-hidden="true" className="size-3.5" />
-          <span>Due {formatDueDate(task.dueDate)}</span>
+          <span>Due {formatDate(task.dueDate)}</span>
         </span>
       </CardContent>
     </Card>

@@ -29,6 +29,7 @@ import TaskCardBody from "./task-card-body";
 
 interface KanbanBoardProps {
   tasks: readonly Task[];
+  onViewTask: (task: Task) => void;
   onEditTask: (task: Task) => void;
   onDeleteTask: (task: Task) => void;
   onCreateTask: (status: TaskStatus) => void;
@@ -41,6 +42,7 @@ const screenReaderInstructions: ScreenReaderInstructions = {
 
 const KanbanBoard = ({
   tasks,
+  onViewTask,
   onEditTask,
   onDeleteTask,
   onCreateTask,
@@ -128,6 +130,7 @@ const KanbanBoard = ({
             key={status}
             status={status}
             tasks={grouped[status]}
+            onViewTask={onViewTask}
             onEditTask={onEditTask}
             onDeleteTask={onDeleteTask}
             onAddTask={onCreateTask}
@@ -138,6 +141,7 @@ const KanbanBoard = ({
         {activeTask && (
           <TaskCardBody
             task={activeTask}
+            onViewTask={onViewTask}
             onEditTask={onEditTask}
             onDeleteTask={onDeleteTask}
             isOverlay

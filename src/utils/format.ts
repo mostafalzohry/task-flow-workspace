@@ -1,10 +1,10 @@
-const dueDateFormatter = new Intl.DateTimeFormat("en-US", {
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
   month: "short",
   day: "numeric",
   year: "numeric",
   timeZone: "UTC",
 });
 
-export function formatDueDate(isoDate: string): string {
-  return dueDateFormatter.format(new Date(isoDate));
+export function formatDate(isoDate: string): string {
+  return dateFormatter.format(new Date(isoDate));
 }
