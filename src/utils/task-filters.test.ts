@@ -24,7 +24,7 @@ const makeTask = (overrides: Partial<Task> = {}): Task => ({
 });
 
 describe("coercion helpers", () => {
-  it("asStatusFilter falls back to 'all' for unknown values", () => {
+  it("asStatusFilter falls back to 'all' for unrecognised values", () => {
     expect(asStatusFilter("done")).toBe("done");
     expect(asStatusFilter("nonsense")).toBe("all");
     expect(asStatusFilter(null)).toBe("all");

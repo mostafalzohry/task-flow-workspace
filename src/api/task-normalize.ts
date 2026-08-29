@@ -1,6 +1,17 @@
 import { PRIORITY_ORDER, STATUS_ORDER } from "@/config";
 import type { Task, TaskPriority, TaskStatus } from "@/types";
 
+
+export interface RawTask {
+  id?: string | number;
+  title?: string;
+  description?: string;
+  status?: string;
+  priority?: string;
+  dueDate?: string | number;
+  createdAt?: string | number;
+}
+
 class InvalidRecordError extends Error {}
 
 function required<T>(value: T | null): T {
@@ -10,11 +21,7 @@ function required<T>(value: T | null): T {
   return value;
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
-
-function normalizeId(value: unknown): string | null {
+function normalizeId(value: RawTask["id"]): string | null {
   if (typeof value === "string" && value.trim() !== "") {
     return value;
   }
@@ -24,19 +31,19 @@ function normalizeId(value: unknown): string | null {
   return null;
 }
 
-function normalizeText(value: unknown): string | null {
+function normalizeText(value: string | undefined): string | null {
   return typeof value === "string" ? value : null;
 }
 
-function normalizeStatus(value: unknown): TaskStatus | null {
+function normalizeStatus(value: string | undefined): TaskStatus | null {
   return STATUS_ORDER.find((status) => status === value) ?? null;
 }
 
-function normalizePriority(value: unknown): TaskPriority | null {
+function normalizePriority(value: string | undefined): TaskPriority | null {
   return PRIORITY_ORDER.find((priority) => priority === value) ?? null;
 }
 
-function toDate(value: unknown): Date | null {
+function toDate(value: string | number | undefined): Date | null {
   if (typeof value === "number" && Number.isFinite(value)) {
     const seconds = new Date(value * 1000);
     if (!Number.isNaN(seconds.getTime())) {
@@ -52,18 +59,18 @@ function toDate(value: unknown): Date | null {
   return null;
 }
 
-function normalizeDueDate(value: unknown): string | null {
+function normalizeDueDate(value: RawTask["dueDate"]): string | null {
   const date = toDate(value);
   return date ? date.toISOString().slice(0, 10) : null;
 }
 
-function normalizeCreatedAt(value: unknown): string | null {
+function normalizeCreatedAt(value: RawTask["createdAt"]): string | null {
   const date = toDate(value);
   return date ? date.toISOString() : null;
 }
 
-export function normalizeTask(value: unknown): Task | null {
-  if (!isRecord(value)) {
+export function normalizeTask(value: RawTask): Task | null {
+  if (typeof value !== "object" || value === null) {
     return null;
   }
 
@@ -85,7 +92,7 @@ export function normalizeTask(value: unknown): Task | null {
   }
 }
 
-export function normalizeTasks(value: unknown): Task[] {
+export function normalizeTasks(value: RawTask[]): Task[] {
   if (!Array.isArray(value)) {
     return [];
   }

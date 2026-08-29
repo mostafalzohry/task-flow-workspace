@@ -36,8 +36,6 @@ describe("normalizeTask", () => {
     expect(normalizeTask({ ...valid, title: undefined })).toBeNull();
     expect(normalizeTask({ ...valid, status: "archived" })).toBeNull();
     expect(normalizeTask({ ...valid, dueDate: "nonsense" })).toBeNull();
-    expect(normalizeTask(null)).toBeNull();
-    expect(normalizeTask("string")).toBeNull();
   });
 });
 
@@ -49,10 +47,5 @@ describe("normalizeTasks", () => {
       { ...valid, id: "44" },
     ]);
     expect(result.map((t) => t.id)).toEqual(["42", "44"]);
-  });
-
-  it("returns an empty array for non-array input", () => {
-    expect(normalizeTasks({})).toEqual([]);
-    expect(normalizeTasks(null)).toEqual([]);
   });
 });

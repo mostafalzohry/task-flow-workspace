@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 import { PRIORITY_META } from "@/config";
 import type { Task } from "@/types";
 import { getDueDateStatus } from "@/utils/due-date";
-import DueDate from "./due-date";
+import DueDate from "../common/due-date";
 
 interface TaskCardBodyProps {
   task: Task;

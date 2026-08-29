@@ -26,7 +26,7 @@ import {
 } from "@/config";
 import { usePatchTask } from "@/queries/use-task-mutations";
 import type { SortOrder, Task, TaskSortField } from "@/types";
-import DueDate from "./due-date";
+import DueDate from "../common/due-date";
 import TaskTableSortHeader from "./task-table-sort-header";
 
 interface TaskTableProps {

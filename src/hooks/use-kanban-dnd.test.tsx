@@ -14,17 +14,17 @@ const tasks = [
   makeTask({ id: "2", title: "Second", status: "in-progress" }),
 ];
 
-const startEvent = (id: string) =>
-  ({ active: { id } }) as unknown as DragStartEvent;
+const startEvent = (id: string): DragStartEvent =>
+  ({ active: { id } }) as never;
 
 const endEvent = (
   activeStatus: string,
-  over: Record<string, unknown> | null,
+  over: { type?: string; status?: string } | null,
 ): DragEndEvent =>
   ({
     active: { id: "1", data: { current: { type: "card", status: activeStatus } } },
     over: over === null ? null : { id: "col", data: { current: over } },
-  }) as unknown as DragEndEvent;
+  }) as never;
 
 beforeEach(() => mutate.mockClear());
 

@@ -5,6 +5,7 @@ import { CSS } from "@dnd-kit/utilities";
 
 import { cn } from "@/lib/utils";
 import type { Task } from "@/types";
+import type { DragData } from "@/utils/kanban-dnd";
 import TaskCardBody from "./task-card-body";
 
 interface TaskCardProps {
@@ -23,7 +24,7 @@ const TaskCard = ({
   const { setNodeRef, attributes, listeners, transform, transition, isDragging } =
     useSortable({
       id: task.id,
-      data: { type: "card", status: task.status },
+      data: { type: "card", status: task.status } satisfies DragData,
     });
 
   return (

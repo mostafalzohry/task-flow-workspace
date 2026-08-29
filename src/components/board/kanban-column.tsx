@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { STATUS_META } from "@/config";
 import type { Task, TaskStatus } from "@/types";
+import type { DragData } from "@/utils/kanban-dnd";
 import TaskCard from "./task-card";
 
 interface KanbanColumnProps {
@@ -34,7 +35,7 @@ const KanbanColumn = ({
   const headingId = `column-${status}`;
   const { setNodeRef, isOver } = useDroppable({
     id: status,
-    data: { type: "column", status },
+    data: { type: "column", status } satisfies DragData,
   });
 
   return (

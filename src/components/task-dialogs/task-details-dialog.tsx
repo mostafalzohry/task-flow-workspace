@@ -13,8 +13,8 @@ import {
 import { PRIORITY_META, STATUS_META } from "@/config";
 import { useTaskQuery } from "@/queries/use-task";
 import { formatDate } from "@/utils/format";
-import DueDate from "./due-date";
-import ErrorState from "./error-state";
+import DueDate from "../common/due-date";
+import ErrorState from "../common/error-state";
 import TaskDetailsSkeleton from "./task-details-skeleton";
 
 interface TaskDetailsDialogProps {

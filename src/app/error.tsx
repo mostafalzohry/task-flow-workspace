@@ -3,7 +3,7 @@
 import { startTransition } from "react";
 import { useRouter } from "next/navigation";
 
-import ErrorState from "@/components/error-state";
+import ErrorState from "@/components/common/error-state";
 
 interface ErrorBoundaryProps {
   error: Error & { digest?: string };

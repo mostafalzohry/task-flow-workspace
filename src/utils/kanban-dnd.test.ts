@@ -2,7 +2,7 @@ import { readStatus, resolveColumnMove } from "./kanban-dnd";
 
 const active = (id: string, status: string) =>
   ({ id, data: { current: { type: "card", status } } }) as never;
-const over = (data: Record<string, unknown> | null) =>
+const over = (data: { type?: string; status?: string } | null) =>
   (data === null ? null : { id: "x", data: { current: data } }) as never;
 
 describe("readStatus", () => {

@@ -12,8 +12,15 @@ import type {
 import { STATUS_ORDER } from "@/config";
 import type { TaskStatus } from "@/types";
 
+export interface DragData {
+  type: "card" | "column";
+  status: TaskStatus;
+}
+
+type LooseDragData = { type?: string; status?: string };
+
 export function readStatus(
-  data: Record<string, unknown> | null | undefined,
+  data: LooseDragData | null | undefined,
 ): TaskStatus | null {
   if (!data) {
     return null;

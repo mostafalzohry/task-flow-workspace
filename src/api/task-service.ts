@@ -7,11 +7,11 @@ import type {
   TaskListParams,
   UpdateTaskInput,
 } from "@/types";
-import { normalizeTask, normalizeTasks } from "./task-normalize";
+import { normalizeTask, normalizeTasks, type RawTask } from "./task-normalize";
 
 const TASKS_PATH = "/tasks";
 
-function requestError(error: unknown, message: string): Error {
+function requestError(error: Error, message: string): Error {
   if (axios.isAxiosError(error)) {
     if (error.code === "ECONNABORTED" || error.code === "ETIMEDOUT") {
       return new Error("The request timed out. Please try again.");
@@ -48,7 +48,7 @@ function buildListParams(params: TaskListParams): Record<string, string> {
 
 export async function getTasks(params: TaskListParams): Promise<Task[]> {
   try {
-    const response = await httpClient.get<unknown>(TASKS_PATH, {
+    const response = await httpClient.get<RawTask[]>(TASKS_PATH, {
       params: buildListParams(params),
     });
     return normalizeTasks(response.data);
@@ -56,13 +56,13 @@ export async function getTasks(params: TaskListParams): Promise<Task[]> {
     if (axios.isAxiosError(error) && error.response?.status === 404) {
       return [];
     }
-    throw requestError(error, "We couldn't load your tasks. Please try again.");
+    throw requestError(error as Error, "We couldn't load your tasks. Please try again.");
   }
 }
 
 export async function getTaskById(id: string): Promise<Task> {
   try {
-    const response = await httpClient.get<unknown>(`${TASKS_PATH}/${id}`);
+    const response = await httpClient.get<RawTask>(`${TASKS_PATH}/${id}`);
     const task = normalizeTask(response.data);
     if (!task) {
       throw new Error("We couldn't load this task. Please try again.");
@@ -72,20 +72,20 @@ export async function getTaskById(id: string): Promise<Task> {
     if (axios.isAxiosError(error) && error.response?.status === 404) {
       throw new Error("This task no longer exists.");
     }
-    throw requestError(error, "We couldn't load this task. Please try again.");
+    throw requestError(error as Error, "We couldn't load this task. Please try again.");
   }
 }
 
 export async function createTask(input: CreateTaskInput): Promise<Task> {
   try {
-    const response = await httpClient.post<unknown>(TASKS_PATH, input);
+    const response = await httpClient.post<RawTask>(TASKS_PATH, input);
     const task = normalizeTask(response.data);
     if (!task) {
       throw new Error("We couldn't create the task. Please try again.");
     }
     return task;
   } catch (error) {
-    throw requestError(error, "We couldn't create the task. Please try again.");
+    throw requestError(error as Error, "We couldn't create the task. Please try again.");
   }
 }
 
@@ -94,14 +94,14 @@ export async function updateTask(
   input: UpdateTaskInput,
 ): Promise<Task> {
   try {
-    const response = await httpClient.put<unknown>(`${TASKS_PATH}/${id}`, input);
+    const response = await httpClient.put<RawTask>(`${TASKS_PATH}/${id}`, input);
     const task = normalizeTask(response.data);
     if (!task) {
       throw new Error("We couldn't save your changes. Please try again.");
     }
     return task;
   } catch (error) {
-    throw requestError(error, "We couldn't save your changes. Please try again.");
+    throw requestError(error as Error, "We couldn't save your changes. Please try again.");
   }
 }
 
@@ -109,6 +109,6 @@ export async function deleteTask(id: string): Promise<void> {
   try {
     await httpClient.delete(`${TASKS_PATH}/${id}`);
   } catch (error) {
-    throw requestError(error, "We couldn't delete the task. Please try again.");
+    throw requestError(error as Error, "We couldn't delete the task. Please try again.");
   }
 }

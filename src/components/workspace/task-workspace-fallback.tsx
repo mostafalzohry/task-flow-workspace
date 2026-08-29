@@ -1,5 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import KanbanBoardSkeleton from "./kanban-board-skeleton";
+import KanbanBoardSkeleton from "../board/kanban-board-skeleton";
 
 const TaskWorkspaceFallback = () => {
   return (

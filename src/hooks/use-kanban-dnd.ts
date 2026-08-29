@@ -52,7 +52,7 @@ export function useKanbanDnd(tasks: readonly Task[]) {
   const announcements = useMemo<Announcements>(() => {
     const label = (id: UniqueIdentifier) => titles.get(String(id)) ?? "task";
     const columnLabel = (
-      over: { data: { current?: Record<string, unknown> | null } } | null,
+      over: { data: { current?: { status?: string } | null } } | null,
     ) => {
       const status = readStatus(over?.data.current);
       return status ? STATUS_META[status].label : null;

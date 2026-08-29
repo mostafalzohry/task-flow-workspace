@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 
-import TaskWorkspace from "@/components/task-workspace";
-import TaskWorkspaceFallback from "@/components/task-workspace-fallback";
+import TaskWorkspace from "@/components/workspace/task-workspace";
+import TaskWorkspaceFallback from "@/components/workspace/task-workspace-fallback";
 
 const Home = () => {
   return (
