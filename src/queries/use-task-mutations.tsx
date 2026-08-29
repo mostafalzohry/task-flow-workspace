@@ -1,13 +1,15 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeftRight } from "lucide-react";
+import { ArrowLeftRight, Flag } from "lucide-react";
 import { toast } from "sonner";
 
 import { createTask, deleteTask, updateTask } from "@/api/task-service";
-import { STATUS_META } from "@/config";
-import type { CreateTaskInput, Task, TaskStatus, UpdateTaskInput } from "@/types";
+import { PRIORITY_META, STATUS_META } from "@/config";
+import type { CreateTaskInput, Task, UpdateTaskInput } from "@/types";
 import { taskKeys } from "./task-keys";
+
+type TaskPatch = Pick<Partial<Task>, "status" | "priority">;
 
 export function useCreateTask() {
   const queryClient = useQueryClient();
@@ -43,13 +45,13 @@ export function useDeleteTask() {
   });
 }
 
-export function useMoveTask() {
+export function usePatchTask() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (variables: { id: string; status: TaskStatus }) =>
-      updateTask(variables.id, { status: variables.status }),
-    onMutate: async ({ id, status }) => {
+    mutationFn: (variables: { id: string; patch: TaskPatch }) =>
+      updateTask(variables.id, variables.patch),
+    onMutate: async ({ id, patch }) => {
       await queryClient.cancelQueries({ queryKey: taskKeys.lists() });
       const snapshots = queryClient.getQueriesData<Task[]>({
         queryKey: taskKeys.lists(),
@@ -60,7 +62,7 @@ export function useMoveTask() {
         }
         queryClient.setQueryData<Task[]>(
           key,
-          data.map((task) => (task.id === id ? { ...task, status } : task)),
+          data.map((task) => (task.id === id ? { ...task, ...patch } : task)),
         );
       }
       return { snapshots };
@@ -69,12 +71,19 @@ export function useMoveTask() {
       for (const [key, data] of context?.snapshots ?? []) {
         queryClient.setQueryData(key, data);
       }
-      toast.error("We couldn't move the task. Please try again.");
+      toast.error("We couldn't update the task. Please try again.");
     },
-    onSuccess: (task) => {
-      toast.info(`“${task.title}” moved to ${STATUS_META[task.status].label}`, {
-        icon: <ArrowLeftRight className="size-4" />,
-      });
+    onSuccess: (task, { patch }) => {
+      if (patch.status !== undefined) {
+        toast.info(`“${task.title}” moved to ${STATUS_META[task.status].label}`, {
+          icon: <ArrowLeftRight className="size-4" />,
+        });
+      } else if (patch.priority !== undefined) {
+        toast.info(
+          `“${task.title}” set to ${PRIORITY_META[task.priority].label} priority`,
+          { icon: <Flag className="size-4" /> },
+        );
+      }
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: taskKeys.lists() });

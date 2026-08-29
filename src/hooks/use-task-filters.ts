@@ -7,19 +7,26 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import type {
   PriorityFilter,
+  SortOrder,
   StatusFilter,
   TaskFilters,
+  TaskFiltersState,
   TaskListQuery,
+  TaskSortField,
+  TaskView,
 } from "@/types";
 import {
   filtersCleared,
   filtersReplaced,
   fromDateChanged,
+  pageChanged,
   priorityChanged,
   searchChanged,
   selectTaskFilters,
+  sortChanged,
   statusChanged,
   toDateChanged,
+  viewChanged,
 } from "@/store/task-filters-slice";
 import { buildTaskFilterQuery, parseTaskFilters } from "@/utils/task-filters";
 
@@ -43,6 +50,13 @@ export interface UseTaskFiltersResult {
   setFrom: (value: string) => void;
   to: string;
   setTo: (value: string) => void;
+  view: TaskView;
+  setView: (value: TaskView) => void;
+  sortBy: TaskSortField;
+  sortOrder: SortOrder;
+  setSort: (field: TaskSortField) => void;
+  page: number;
+  setPage: (value: number) => void;
   clearFilters: () => void;
   hasActiveFilters: boolean;
   dateRangeError: string | null;
@@ -75,7 +89,7 @@ export function useTaskFilters(): UseTaskFiltersResult {
   }, [searchParamsString, dispatch]);
 
   const updateUrl = useCallback(
-    (nextFilters: TaskFilters) => {
+    (nextFilters: TaskFiltersState) => {
       const next = buildTaskFilterQuery(searchParamsString, nextFilters);
       if (next === searchParamsString) {
         return;
@@ -94,39 +108,57 @@ export function useTaskFilters(): UseTaskFiltersResult {
       return;
     }
 
-    const nextFilters = { ...filters, search: appliedSearch };
     dispatch(searchChanged(appliedSearch));
-    updateUrl(nextFilters);
+    updateUrl({ ...filters, search: appliedSearch, page: 1 });
   }, [appliedSearch, searchInput, filters, dispatch, updateUrl]);
 
   const setStatus = (value: StatusFilter) => {
-    const nextFilters = { ...filters, status: value };
     dispatch(statusChanged(value));
-    updateUrl(nextFilters);
+    updateUrl({ ...filters, status: value, page: 1 });
   };
 
   const setPriority = (value: PriorityFilter) => {
-    const nextFilters = { ...filters, priority: value };
     dispatch(priorityChanged(value));
-    updateUrl(nextFilters);
+    updateUrl({ ...filters, priority: value, page: 1 });
   };
 
   const setFrom = (value: string) => {
-    const nextFilters = { ...filters, from: value };
     dispatch(fromDateChanged(value));
-    updateUrl(nextFilters);
+    updateUrl({ ...filters, from: value, page: 1 });
   };
 
   const setTo = (value: string) => {
-    const nextFilters = { ...filters, to: value };
     dispatch(toDateChanged(value));
-    updateUrl(nextFilters);
+    updateUrl({ ...filters, to: value, page: 1 });
+  };
+
+  const setView = (value: TaskView) => {
+    dispatch(viewChanged(value));
+    updateUrl({ ...filters, view: value, page: 1 });
+  };
+
+  const setSort = (field: TaskSortField) => {
+    const sortOrder: SortOrder =
+      filters.sortBy === field && filters.sortOrder === "asc" ? "desc" : "asc";
+    dispatch(sortChanged({ sortBy: field, sortOrder }));
+    updateUrl({ ...filters, sortBy: field, sortOrder, page: 1 });
+  };
+
+  const setPage = (value: number) => {
+    dispatch(pageChanged(value));
+    updateUrl({ ...filters, page: value });
   };
 
   const clearFilters = () => {
     setSearchInput("");
     dispatch(filtersCleared());
-    updateUrl(CLEARED_FILTERS);
+    updateUrl({
+      ...CLEARED_FILTERS,
+      view: filters.view,
+      sortBy: filters.sortBy,
+      sortOrder: filters.sortOrder,
+      page: 1,
+    });
   };
 
   const dateRangeError =
@@ -172,6 +204,13 @@ export function useTaskFilters(): UseTaskFiltersResult {
     setFrom,
     to: filters.to,
     setTo,
+    view: filters.view,
+    setView,
+    sortBy: filters.sortBy,
+    sortOrder: filters.sortOrder,
+    setSort,
+    page: filters.page,
+    setPage,
     clearFilters,
     hasActiveFilters,
     dateRangeError,

@@ -4,7 +4,7 @@ import { httpClient } from "@/lib/http";
 import type {
   CreateTaskInput,
   Task,
-  TaskListQuery,
+  TaskListParams,
   UpdateTaskInput,
 } from "@/types";
 import { normalizeTask, normalizeTasks } from "./task-normalize";
@@ -24,24 +24,32 @@ function requestError(error: unknown, message: string): Error {
   return new Error(message);
 }
 
-function buildListParams(query: TaskListQuery): Record<string, string> {
-  const params: Record<string, string> = {};
-  if (query.search) {
-    params.search = query.search;
+function buildListParams(params: TaskListParams): Record<string, string> {
+  const query: Record<string, string> = {};
+  if (params.search) {
+    query.search = params.search;
   }
-  if (query.status !== "all") {
-    params.status = query.status;
+  if (params.status !== "all") {
+    query.status = params.status;
   }
-  if (query.priority !== "all") {
-    params.priority = query.priority;
+  if (params.priority !== "all") {
+    query.priority = params.priority;
   }
-  return params;
+  if (params.sortBy) {
+    query.sortBy = params.sortBy;
+    query.order = params.sortOrder ?? "asc";
+  }
+  if (params.page && params.limit) {
+    query.page = String(params.page);
+    query.limit = String(params.limit);
+  }
+  return query;
 }
 
-export async function getTasks(query: TaskListQuery): Promise<Task[]> {
+export async function getTasks(params: TaskListParams): Promise<Task[]> {
   try {
     const response = await httpClient.get<unknown>(TASKS_PATH, {
-      params: buildListParams(query),
+      params: buildListParams(params),
     });
     return normalizeTasks(response.data);
   } catch (error) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -20,7 +20,7 @@ import type {
 import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 
 import { STATUS_META, STATUS_ORDER } from "@/config";
-import { useMoveTask } from "@/queries/use-task-mutations";
+import { usePatchTask } from "@/queries/use-task-mutations";
 import type { Task, TaskStatus } from "@/types";
 import { collisionDetection, readStatus } from "@/utils/kanban-dnd";
 import { groupByStatus } from "@/utils/task-grouping";
@@ -45,9 +45,9 @@ const KanbanBoard = ({
   onDeleteTask,
   onCreateTask,
 }: KanbanBoardProps) => {
-  const grouped = groupByStatus(tasks);
+  const grouped = useMemo(() => groupByStatus(tasks), [tasks]);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
-  const moveTask = useMoveTask();
+  const patchTask = usePatchTask();
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -106,7 +106,7 @@ const KanbanBoard = ({
     if (!fromStatus || !toStatus || fromStatus === toStatus) {
       return;
     }
-    moveTask.mutate({ id: String(active.id), status: toStatus });
+    patchTask.mutate({ id: String(active.id), patch: { status: toStatus } });
   };
 
   const handleDragCancel = () => {
@@ -148,4 +148,4 @@ const KanbanBoard = ({
   );
 };
 
-export default KanbanBoard;
+export default memo(KanbanBoard);
