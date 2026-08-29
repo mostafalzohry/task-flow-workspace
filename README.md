@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TaskFlow — Interactive Task & Workflow Workspace
 
-## Getting Started
+A Kanban and list-based task management dashboard. Organize work across the
+To Do → In Progress → In Review → Done pipeline with full CRUD, drag-and-drop
+between statuses, a virtualized list view, debounced search, multi-criteria and
+date-range filtering that is synced to the URL (so any view is a shareable link),
+optimistic status changes, and accessible dialogs and drag-and-drop.
 
-First, run the development server:
+**Live demo:** https://task-flow-workspace-rose.vercel.app
+
+## Quick Start
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repo-url>
+cd task-flow-workspace
+npm install
+npm run dev            # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+A working MockAPI base URL is committed in `.env`, so no configuration is needed
+to run the app. To point it at your own backend, copy `.env.example` to
+`.env.local` and set `NEXT_PUBLIC_MOCK_API_BASE_URL` (it is resolved and
+validated in `src/lib/env.ts`).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the dev server |
+| `npm run build` | Production build |
+| `npm test` | Run the test suite (unit + integration) |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Architecture & Key Decisions
 
-## Learn More
+- **Next.js 16 (App Router)** — React Server Components and file-based routing.
+- **TanStack Query** owns all server data (`src/queries/`): caching,
+  `keepPreviousData` pagination, and optimistic status/priority updates with
+  rollback in `src/queries/use-task-mutations.tsx`
+  (`usePatchTask` — `onMutate` / `onError` / `onSettled`).
+- **Redux Toolkit** (`src/store/`) holds only the client UI state — filter, view,
+  sort, and page. The **URL query string is the source of truth** and hydrates
+  the store through `src/hooks/use-task-filters.ts`, so every filtered view is a
+  shareable link.
+- **Layered structure** — `api/` (an axios service plus a `normalize` layer,
+  `src/api/task-normalize.ts`, that turns untrusted MockAPI JSON into typed
+  `Task` objects) → `queries/` + `hooks/` (data and logic) → `components/`
+  grouped by feature (`board/`, `list/`, `task-dialogs/`, `workspace/`,
+  `common/`, `ui/`).
+- **Forms** — React Hook Form with a Yup schema
+  (`src/schemas/task-form-schema.ts`): accessible inline errors and a
+  past-due-date guard.
+- **Drag & drop** — `@dnd-kit` with pointer, touch, and keyboard sensors plus
+  live screen-reader announcements (`src/hooks/use-kanban-dnd.ts`).
+- **Performance** — row virtualization via `@tanstack/react-virtual` in the list
+  table; `React.memo` / `useMemo` / `useCallback` on hot paths.
+- **Styling** — Tailwind CSS v4 with shadcn/ui (Radix primitives) for accessible
+  dialogs, selects, and menus.
+- **TypeScript** — `strict: true`, with no `any` or `unknown`; API responses are
+  validated at the boundary rather than cast.
 
-To learn more about Next.js, take a look at the following resources:
+## Testing
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Jest + React Testing Library — **60 tests across 12 suites**.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Unit** — custom hooks (`use-debounced-value`, `use-task-filters`,
+  `use-kanban-dnd`), utility functions, the Redux slice, and the API normalizer.
+- **Integration** — the create-a-task flow, keyboard drag across columns, and
+  debounced filtering.
 
-## Deploy on Vercel
+```bash
+npm test
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Engineering Trade-Offs (48h)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Features consciously left outside the time-box:
+
+- **Single-user scope** — no auth, assignees, or multiple workspaces; the focus
+  was a polished single board / list experience.
+- **Comments and attachments** on tasks.
+- **Analytics dashboard** (throughput, cycle time, per-status metrics).
+
+## Deployment
+
+Deployed on Vercel: https://task-flow-workspace-rose.vercel.app
